@@ -37,14 +37,14 @@ class Board(object):
                 hash //= 3
 
             col = []
-            
+
             for item in digits:
-                
+
                 # 2 indicates new column
                 if item == 2:
                     self.board.append(col)
                     col = []
-                
+
                 # otherwise directly append base number
                 else:
                     col.append(item)
