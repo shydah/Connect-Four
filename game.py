@@ -1,3 +1,4 @@
+import time
 from board import Board
 from player import PlayerMM, PlayerAB, ManualPlayer
 
@@ -19,14 +20,17 @@ class Game:
             turns = turns + 1
 
             # finds the move to make
+            start_time = time.time()
             if isPlayer1:
                 move = self.player1.findMove(board)
             else:
                 move = self.player2.findMove(board)
+            end_time = time.time()
 
             # makes the move
             board.makeMove(move)
             board.print()
+            print(end_time - start_time)
 
             # determines if the game is over or not
             isOver = board.isTerminal()
@@ -55,5 +59,5 @@ if __name__ == "__main__":
         else:
             print("\n올바르지 않은 입력입니다.")
 
-    game = Game(Board(), PlayerAB(7, True), ManualPlayer(5, True))
+    game = Game(Board(), PlayerAB(8, isPlayer1), ManualPlayer(5, True))
     game.simulateLocalGame(isPlayer1)
