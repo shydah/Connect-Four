@@ -123,6 +123,59 @@ class Player:
         return heur
 
 
+class PlayerMM(Player):
+    def __init__(self, depthLimit, isPlayerOne):
+        super().__init__(depthLimit, isPlayerOne)
+
+    # returns the optimal column to move in by implementing the MiniMax algorithm
+    def findMove(self, board):
+        #return self.mmH(board, self.depthLimit, self.isPlayerOne)
+        #return self.minMaxHelper(board, self.depthLimit, self.isPlayerOne)
+        score, move = self.miniMax(board, self.depthLimit, self.isPlayerOne)
+        print(self.isPlayerOne, "move made", move)
+        return move
+
+    # findMove helper function using miniMax algorithm
+    def miniMax(self, board, depth, player):
+        if board.isTerminal() == 0:
+            return -math.inf if player else math.inf, -1
+        elif depth == 0:
+            return self.heuristic(board), -1
+
+        if player:
+            bestScore = -math.inf
+            shouldReplace = lambda x: x > bestScore
+        else:
+            bestScore = math.inf
+            shouldReplace = lambda x: x < bestScore
+
+        bestMove = -1
+
+        children = board.children()
+        for child in children:
+            move, childboard = child
+            temp = self.miniMax(childboard, depth-1, not player)[0]
+            if shouldReplace(temp):
+                bestScore = temp
+                bestMove = move
+        return bestScore, bestMove
+
+    # minimax helper function - unused
+    def mmH(self, board, depth, player):
+
+        if depth == 0:
+            boards = board.children()
+            scores = {}
+            for i in boards:
+                scores[i[0]] = self.heuristic(i[1])
+            if player:
+                return max(scores, key=lambda k: scores[k])
+            else:
+                return min(scores, key=lambda k: scores[k])
+        else:
+            return self.mmH(board,depth-1,not player)
+        
+
 class PlayerAB(Player):
 
     def __init__(self, depthLimit, isPlayerOne):

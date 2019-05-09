@@ -1,6 +1,6 @@
 import time
 from board import Board
-from player import PlayerAB, ManualPlayer
+from player import PlayerMM, PlayerAB, ManualPlayer
 
 
 class Game:
