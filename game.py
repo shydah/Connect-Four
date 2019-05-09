@@ -24,7 +24,13 @@ class Game:
             if isPlayer1:
                 move = self.player1.findMove(board)
             else:
-                move = self.player2.findMove(board)
+                while True:
+                    move = self.player2.findMove(board)
+                    if turns == 1 and move == 3:
+                        print("4열에 첫 수를 둘 수 없습니다.\n")
+                    else:
+                        break
+
             end_time = time.time()
 
             # makes the move
