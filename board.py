@@ -9,6 +9,8 @@
 # Every cell in the above list contains either a 0 or a 1. Player 1 is represented by 0 tiles, and Player
 
 ##############################################################################
+
+
 class Board(object):
 
     #static class variables - shared across all instances
@@ -165,8 +167,8 @@ class Board(object):
                     row += "   |"
             print(row)
             print("+" + "---+" * self.WIDTH)
-        print(self.lastMove[1])
-        print(self.numMoves)
+        print("선택한 열 : " + str(self.lastMove[1]+1))
+        print("시행 횟수 : " + str(self.numMoves))
 
 
 

@@ -1,8 +1,6 @@
 import math
 
-from board import Board
 
-## Partnered with Nick Konich
 class Player:
 
     def __init__(self, depthLimit, isPlayerOne):
@@ -25,6 +23,10 @@ class Player:
                         heur += 10
                     if state[i][j] == state[i + 1][j] == state[i + 2][j] == 0:
                         heur += 100
+                    if state[i][j] == state[i + 1][j] == state[i + 3][j] == 0:
+                        heur += 100
+                    if state[i][j] == state[i + 2][j] == state[i + 3][j] == 0:
+                        heur += 100
                     if state[i][j] == state[i+1][j] == state[i+2][j] == state[i+3][j] == 0:
                         heur += 10000
 
@@ -32,6 +34,10 @@ class Player:
                     if state[i][j] == state[i + 1][j] == 1:
                         heur -= 10
                     if state[i][j] == state[i + 1][j] == state[i + 2][j] == 1:
+                        heur -= 100
+                    if state[i][j] == state[i + 1][j] == state[i + 3][j] == 1:
+                        heur -= 100
+                    if state[i][j] == state[i + 2][j] == state[i + 3][j] == 1:
                         heur -= 100
                     if state[i][j] == state[i+1][j] == state[i+2][j] == state[i+3][j] == 1:
                         heur -= 10000
@@ -62,7 +68,7 @@ class Player:
                 try:
                     # add player one streaks to heur
                     if not j + 3 > board.HEIGHT and state[i][j] == state[i + 1][j + 1] == 0:
-                        heur += 100
+                        heur += 10
                     if not j + 3 > board.HEIGHT and state[i][j] == state[i + 1][j + 1] == state[i + 2][j + 2] == 0:
                         heur += 100
                     if not j + 3 > board.HEIGHT and state[i][j] == state[i+1][j + 1] == state[i+2][j + 2] \
@@ -71,7 +77,7 @@ class Player:
 
                     # add player two streaks to heur
                     if not j + 3 > board.HEIGHT and state[i][j] == state[i + 1][j + 1] == 1:
-                        heur -= 100
+                        heur -= 10
                     if not j + 3 > board.HEIGHT and state[i][j] == state[i + 1][j + 1] == state[i + 2][j + 2] == 1:
                         heur -= 100
                     if not j + 3 > board.HEIGHT and state[i][j] == state[i+1][j + 1] == state[i+2][j + 2] \
@@ -104,61 +110,6 @@ class Player:
         return heur
 
 
-
-
-class PlayerMM(Player):
-    def __init__(self, depthLimit, isPlayerOne):
-        super().__init__(depthLimit, isPlayerOne)
-
-    # returns the optimal column to move in by implementing the MiniMax algorithm
-    def findMove(self, board):
-        #return self.mmH(board, self.depthLimit, self.isPlayerOne)
-        #return self.minMaxHelper(board, self.depthLimit, self.isPlayerOne)
-        score, move = self.miniMax(board, self.depthLimit, self.isPlayerOne)
-        print(self.isPlayerOne, "move made", move)
-        return move
-
-    # findMove helper function using miniMax algorithm
-    def miniMax(self, board, depth, player):
-        if board.isTerminal() == 0:
-            return -math.inf if player else math.inf, -1
-        elif depth == 0:
-            return self.heuristic(board), -1
-
-        if player:
-            bestScore = -math.inf
-            shouldReplace = lambda x: x > bestScore
-        else:
-            bestScore = math.inf
-            shouldReplace = lambda x: x < bestScore
-
-        bestMove = -1
-
-        children = board.children()
-        for child in children:
-            move, childboard = child
-            temp = self.miniMax(childboard, depth-1, not player)[0]
-            if shouldReplace(temp):
-                bestScore = temp
-                bestMove = move
-        return bestScore, bestMove
-
-    # minimax helper function - unused
-    def mmH(self, board, depth, player):
-
-        if depth == 0:
-            boards = board.children()
-            scores = {}
-            for i in boards:
-                scores[i[0]] = self.heuristic(i[1])
-            if player:
-                return max(scores, key=lambda k: scores[k])
-            else:
-                return min(scores, key=lambda k: scores[k])
-        else:
-            return self.mmH(board,depth-1,not player)
-
-
 class PlayerAB(Player):
 
     def __init__(self, depthLimit, isPlayerOne):
@@ -166,11 +117,12 @@ class PlayerAB(Player):
 
     # returns the optimal column to move in by implementing the Alpha-Beta algorithm
     def findMove(self, board):
-        score, move = self.alphaBeta(board, self.depthLimit, self.isPlayerOne, -math.inf, math.inf)
-        return move
+        candidate = []
+        score, move, candidate = self.alphaBeta(board, self.depthLimit, self.isPlayerOne, -math.inf, math.inf, candidate)
+        return move, candidate
 
     # findMove helper function, utilizing alpha-beta pruning within the  minimax algorithm
-    def alphaBeta(self, board, depth, player, alpha, beta):
+    def alphaBeta(self, board, depth, player, alpha, beta, candidate):
         if board.isTerminal() == 0:
             return -math.inf if player else math.inf, -1
         elif depth == 0:
@@ -188,7 +140,12 @@ class PlayerAB(Player):
         children = board.children()
         for child in children:
             move, childboard = child
-            temp = self.alphaBeta(childboard, depth-1, not player, alpha, beta)[0]
+            temp = self.alphaBeta(childboard, depth-1, not player, alpha, beta, candidate)[0]
+
+            if depth == 8:
+                print(str(move+1) + "열을 택하는 경우 " + str(temp) + "이라는 값을 가집니다.")
+                candidate.append(str(temp))
+
             if shouldReplace(temp):
                 bestScore = temp
                 bestMove = move
@@ -198,7 +155,7 @@ class PlayerAB(Player):
                 beta = min(beta, temp)
             if alpha >= beta:
                 break
-        return bestScore, bestMove
+        return bestScore, bestMove, candidate
 
 
 class ManualPlayer(Player):
