@@ -29,7 +29,11 @@ class Player:
                         heur += 100
                     if state[i][j] == state[i+1][j] == state[i+2][j] == state[i+3][j] == 0:
                         heur += 10000
+                except IndexError:
+                    pass
+                
 
+                try:
                     # subtract player two streak score to heur
                     if state[i][j] == state[i + 1][j] == 1:
                         heur -= 10
@@ -53,7 +57,10 @@ class Player:
                         heur += 100
                     if state[i][j] == state[i][j+1] == state[i][j+2] == state[i][j+3] == 0:
                         heur += 10000
+                except IndexError:
+                    pass
 
+                try:
                     # subtract player two streaks from heur
                     if state[i][j] == state[i][j + 1] == 1:
                         heur -= 10
@@ -74,7 +81,10 @@ class Player:
                     if not j + 3 > board.HEIGHT and state[i][j] == state[i+1][j + 1] == state[i+2][j + 2] \
                             == state[i+3][j + 3] == 0:
                         heur += 10000
-
+                except IndexError:
+                    pass
+                
+                try:
                     # add player two streaks to heur
                     if not j + 3 > board.HEIGHT and state[i][j] == state[i + 1][j + 1] == 1:
                         heur -= 10
@@ -96,7 +106,10 @@ class Player:
                     if not j - 3 < 0 and state[i][j] == state[i+1][j - 1] == state[i+2][j - 2] \
                             == state[i+3][j - 3] == 0:
                         heur += 10000
-
+                except IndexError:
+                    pass
+                
+                try:
                     # subtract player two streaks
                     if not j - 3 < 0 and state[i][j] == state[i+1][j - 1] == 1:
                         heur -= 10
