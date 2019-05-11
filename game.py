@@ -1,6 +1,6 @@
 import time
 from board import Board
-from player import PlayerAB, ManualPlayer
+from player import PlayerAB, PlayerMM, ManualPlayer
 
 
 class Game:
@@ -86,5 +86,5 @@ if __name__ == "__main__":
         else:
             print("\n올바르지 않은 입력입니다.")
 
-    game = Game(Board(), PlayerAB(8, isPlayer1), ManualPlayer(5, True))
+    game = Game(Board(), PlayerAB(6, isPlayer1), ManualPlayer(5, not isPlayer1))
     game.simulateLocalGame(isPlayer1)

@@ -1,4 +1,5 @@
 import math
+from board import Board
 
 
 class Player:
@@ -31,7 +32,7 @@ class Player:
                         heur += 10000
                 except IndexError:
                     pass
-                
+
 
                 try:
                     # subtract player two streak score to heur
@@ -83,7 +84,7 @@ class Player:
                         heur += 10000
                 except IndexError:
                     pass
-                
+
                 try:
                     # add player two streaks to heur
                     if not j + 3 > board.HEIGHT and state[i][j] == state[i + 1][j + 1] == 1:
@@ -108,7 +109,7 @@ class Player:
                         heur += 10000
                 except IndexError:
                     pass
-                
+
                 try:
                     # subtract player two streaks
                     if not j - 3 < 0 and state[i][j] == state[i+1][j - 1] == 1:
@@ -121,6 +122,44 @@ class Player:
                 except IndexError:
                     pass
         return heur
+
+
+class PlayerMM(Player):
+    def __init__(self, depthLimit, isPlayerOne):
+        super().__init__(depthLimit, isPlayerOne)
+
+    # returns the optimal column to move in by implementing the MiniMax algorithm
+    def findMove(self, board):
+        #return self.mmH(board, self.depthLimit, self.isPlayerOne)
+        #return self.minMaxHelper(board, self.depthLimit, self.isPlayerOne)
+        score, move = self.miniMax(board, self.depthLimit, self.isPlayerOne)
+        print(self.isPlayerOne, "move made", move)
+        return move
+
+    # findMove helper function using miniMax algorithm
+    def miniMax(self, board, depth, player):
+        if board.isTerminal() == 0:
+            return -math.inf if player else math.inf, -1
+        elif depth == 0:
+            return self.heuristic(board), -1
+
+        if player:
+            bestScore = -math.inf
+            shouldReplace = lambda x: x > bestScore
+        else:
+            bestScore = math.inf
+            shouldReplace = lambda x: x < bestScore
+
+        bestMove = -1
+
+        children = board.children()
+        for child in children:
+            move, childboard = child
+            temp = self.miniMax(childboard, depth-1, not player)[0]
+            if shouldReplace(temp):
+                bestScore = temp
+                bestMove = move
+        return bestScore, bestMove
 
 
 class PlayerAB(Player):
@@ -155,8 +194,8 @@ class PlayerAB(Player):
             move, childboard = child
             temp = self.alphaBeta(childboard, depth-1, not player, alpha, beta, candidate)[0]
 
-            if depth == 8:
-                print(str(move+1) + "열을 택하는 경우 " + str(temp) + "이라는 값을 가집니다.")
+            if depth == self.depthLimit:
+                print(str(move+1) + "열 선택 시: " + str(temp))
                 candidate.append(str(temp))
 
             if shouldReplace(temp):
@@ -178,10 +217,15 @@ class ManualPlayer(Player):
             opts += " " + (str(c + 1) if len(board.board[c]) < 6 else ' ') + "  "
         print(opts)
 
-        col = input("Place an " + ('O' if self.isPlayerOne else 'X') + " in column: ")
-        col = int(col) - 1
+        while True:
+            col = input(('O' if self.isPlayerOne else 'X') + " 말을 놓을 열을 선택하세요: ")
+            try:
+                col = int(col) - 1
+                if col < board.WIDTH and len(board.board[col]) < 6:
+                    break
+            except ValueError:
+                pass
+
+            print("선택할 수 없는 열입니다. 다시 선택하세요.\n")
+
         return col
-
-
-
-
